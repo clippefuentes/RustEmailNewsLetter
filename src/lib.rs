@@ -4,6 +4,10 @@ use actix_web::{
 };
 use actix_web::dev::Server;
 
+pub mod configuration;
+pub mod routes;
+pub mod startup;
+
 async fn health_check() -> HttpResponse {
     HttpResponse::Ok().finish()
 }
