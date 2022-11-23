@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
-use sqlx::PgConnection;
+use sqlx::{PgPool};
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
@@ -11,7 +11,7 @@ pub struct FormData {
 
 pub async fn subscribe(
     form: web::Form<FormData>,
-    connection: web::Data<PgConnection>,
+    connection: web::Data<PgPool>,
 ) -> HttpResponse {
     sqlx::query!(
         r#"

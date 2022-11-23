@@ -3,7 +3,7 @@ use actix_web::{
   web, App, HttpServer
 };
 use actix_web::dev::Server;
-use sqlx::PgConnection;
+use sqlx::PgPool;
 
 use crate::{
   health_check,
@@ -12,7 +12,7 @@ use crate::{
 
 pub fn run(
   listener: TcpListener,
-  connection: PgConnection
+  connection: PgPool
 ) -> Result<Server, std::io::Error> {
   let connection = web::Data::new(connection);
   let server = HttpServer::new(move || {
