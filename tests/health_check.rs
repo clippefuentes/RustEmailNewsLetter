@@ -1,6 +1,20 @@
 use std::net::TcpListener;
-use sqlx::{PgConnection, Connection};
+use sqlx::{PgConnection, Connection, PgPool};
 use RustEmailNewsLetter::configuration::get_configuration;
+use std::fmt;
+
+
+#[derive(Debug)]
+pub struct TestApp {
+    pub address: String,
+    pub db_pool: PgPool,
+}
+
+impl fmt::Display for TestApp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.address)
+    }
+}
 
 #[tokio::test]
 async fn health_check_works() {
@@ -17,16 +31,29 @@ async fn health_check_works() {
     assert_eq!(Some(0), response.content_length());
 }
 
-async fn spawn_app() -> String {
+async fn spawn_app() -> TestApp {
     // let server = RustEmailNewsLetter::run("127.0.0.1:0").expect("Fail to bind address");
     // let _ = tokio::spawn(server);
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     // We retrieve the port assigned to us by the OS
     let port = listener.local_addr().unwrap().port();
-    let server = RustEmailNewsLetter::run(listener).expect("Failed to bind address");
+    // let server = RustEmailNewsLetter::run(listener).expect("Failed to bind address");
+    // let _ = tokio::spawn(server);
+    // // We return the application address to the caller!
+    let address = format!("http://127.0.0.1:{}", port);
+
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    let server = RustEmailNewsLetter::startup::run(listener, connection_pool.clone()).expect("Failed to bind address");
+
     let _ = tokio::spawn(server);
-    // We return the application address to the caller!
-    format!("http://127.0.0.1:{}", port)
+    TestApp {
+        address,
+        db_pool: connection_pool,
+    }
 }
 
 #[tokio::test]

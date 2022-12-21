@@ -8,30 +8,28 @@ pub mod configuration;
 pub mod routes;
 pub mod startup;
 
-async fn health_check() -> HttpResponse {
-    HttpResponse::Ok().finish()
-}
 
-#[derive(serde::Deserialize)]
-struct FormData {
-  email: String,
-  name: String
-}
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
-pub struct Form<T>(pub T);
+// #[derive(serde::Deserialize)]
+// struct FormData {
+//   email: String,
+//   name: String
+// }
 
-async fn subscribe(_form: web::Form<FormData>) -> HttpResponse {
-  HttpResponse::Ok().finish()
-}
+// #[derive(PartialEq, Eq, PartialOrd, Ord)]
+// pub struct Form<T>(pub T);
 
-pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
-  let server = HttpServer::new(|| {
-    App::new()
-      .route("/health_check", web::get().to(health_check))
-      .route("/subscriptions", web::post().to(subscribe))
-  })
-      .listen(listener)?
-      .run();
-    Ok(server)
-}
+// async fn subscribe(_form: web::Form<FormData>) -> HttpResponse {
+//   HttpResponse::Ok().finish()
+// }
+
+// pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
+//   let server = HttpServer::new(|| {
+//     App::new()
+//       .route("/health_check", web::get().to(health_check))
+//       .route("/subscriptions", web::post().to(subscribe))
+//   })
+//       .listen(listener)?
+//       .run();
+//     Ok(server)
+// }

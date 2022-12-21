@@ -5,7 +5,7 @@ use actix_web::{
 use actix_web::dev::Server;
 use sqlx::PgPool;
 
-use crate::{
+use crate::routes::{
   health_check,
   subscribe
 };
